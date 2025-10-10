@@ -22,6 +22,10 @@ let todosLosRegistros = [];
 let paginaActual = 1;
 const REGISTROS_POR_PAGINA = 50;
 
+// Variables para control de sede por rol
+let userRole = null;
+let userSede = null;
+
 /***** UI *****/
 const elInscritos = document.getElementById("inscritos-count");
 const elNoInteresados = document.getElementById("nointeresados-count");
@@ -42,8 +46,35 @@ const btnAbrirSheet = document.getElementById("btn-abrir-sheet");
 /***** CHARTS *****/
 let chartBar, chartPie;
 
+/***** OBTENER ROL Y SEDE DEL USUARIO *****/
+async function obtenerInfoUsuario() {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  
+  if (session) {
+    userRole = session.user.app_metadata.rol;
+    userSede = session.user.app_metadata.sede;
+    
+    console.log("👤 Usuario:", { rol: userRole, sede: userSede });
+    
+    // Si NO es maestro, bloquear el filtro de sede
+    if (userRole !== 'maestro') {
+      selectSede.disabled = true;
+      selectSede.value = userSede;
+      selectSede.style.backgroundColor = '#1a1a1a';
+      selectSede.style.cursor = 'not-allowed';
+      console.log("🔒 Filtro de sede bloqueado para:", userRole);
+    }
+  }
+}
+
 /***** CARGAR SEDES DINÁMICAMENTE *****/
 async function cargarSedes() {
+  // Si no es maestro, no necesitamos cargar sedes (ya está fija)
+  if (userRole !== 'maestro') {
+    console.log("ℹ️ No se cargan sedes (usuario no es maestro)");
+    return;
+  }
+  
   const { data, error } = await supabaseClient
     .from(TABLE_NAME)
     .select(COL_SEDE);
@@ -62,13 +93,25 @@ async function cargarSedes() {
     option.textContent = sede;
     selectSede.appendChild(option);
   });
+  
+  console.log("✅ Sedes cargadas para maestro");
 }
 
 /***** QUERY CON FILTROS Y PAGINACIÓN *****/
 async function buildQuery(conPaginacion = true) {
   let q = supabaseClient.from(TABLE_NAME).select("*", { count: 'exact' }).order(COL_FECHA, { ascending: false });
 
-  if (selectSede.value) q = q.eq(COL_SEDE, selectSede.value);
+  // 🔒 FILTRO AUTOMÁTICO POR SEDE (si no es maestro)
+  if (userRole !== 'maestro' && userSede) {
+    q = q.eq(COL_SEDE, userSede);
+    console.log("🔒 Filtrando por sede:", userSede);
+  }
+
+  // Filtros manuales
+  if (selectSede.value && userRole === 'maestro') {
+    q = q.eq(COL_SEDE, selectSede.value);
+  }
+  
   if (inputDesde.value) q = q.gte(COL_FECHA, inputDesde.value);
   if (inputHasta.value) q = q.lte(COL_FECHA, inputHasta.value);
 
@@ -86,13 +129,13 @@ async function buildQuery(conPaginacion = true) {
 
 /***** CARGAR DATOS CON PAGINACIÓN *****/
 async function cargarDatos() {
-  tablaBody.innerHTML = "<tr><td colspan='13'>Cargando...</td></tr>";
+  tablaBody.innerHTML = "<tr><td colspan='16'>Cargando...</td></tr>";
   hints.textContent = "";
 
   const { data, error, count } = await buildQuery();
   if (error) {
     console.error(error);
-    tablaBody.innerHTML = "<tr><td colspan='13'>Error cargando datos</td></tr>";
+    tablaBody.innerHTML = "<tr><td colspan='16'>Error cargando datos</td></tr>";
     return;
   }
 
@@ -108,7 +151,6 @@ async function cargarDatos() {
 }
 
 /***** RENDER TABLA *****/
-
 function renderTabla(registros) {
   tablaBody.innerHTML = "";
   if (!registros || registros.length === 0) {
@@ -143,7 +185,6 @@ function renderTabla(registros) {
   });
 }
 
-
 /***** RENDERIZAR CONTROLES DE PAGINACIÓN *****/
 function renderizarPaginacion(totalRegistros) {
   const totalPaginas = Math.ceil(totalRegistros / REGISTROS_POR_PAGINA);
@@ -173,7 +214,7 @@ function cambiarPagina(nuevaPagina) {
 /***** MARCAR LLAMADO *****/
 async function marcarLlamado(id, value) {
   const { error } = await supabaseClient
-    .from(TABLE_NAME)
+    .from("invitados")
     .update({ [COL_LLAMADO]: value })
     .eq("id", id);
 
@@ -187,7 +228,7 @@ async function marcarLlamado(id, value) {
 
 /***** EXPORTAR A EXCEL (por sede + resumen) *****/
 async function exportarExcel() {
-  const { data, error } = await buildQuery(false); // Sin paginación para exportar todo
+  const { data, error } = await buildQuery(false);
   if (error || !data || data.length === 0) {
     alert("No hay datos para exportar");
     return;
@@ -241,7 +282,11 @@ async function exportarExcel() {
     XLSX.utils.book_append_sheet(wb, hoja, sede.substring(0, 31));
   });
 
-  XLSX.writeFile(wb, "registros_por_sede.xlsx");
+  const nombreArchivo = userRole === 'maestro' 
+    ? "registros_todas_sedes.xlsx"
+    : `registros_${userSede}.xlsx`;
+  
+  XLSX.writeFile(wb, nombreArchivo);
 }
 
 /***** EVENTOS *****/
@@ -251,7 +296,10 @@ btnAplicar.addEventListener("click", () => {
 });
 
 btnLimpiar.addEventListener("click", () => {
-  selectSede.value = "";
+  // Si no es maestro, mantener la sede bloqueada
+  if (userRole === 'maestro') {
+    selectSede.value = "";
+  }
   inputDesde.value = "";
   inputHasta.value = "";
   selectVer.value = "todos";
@@ -263,14 +311,10 @@ btnExportar.addEventListener("click", exportarExcel);
 
 if (btnExportarSheets) {
   btnExportarSheets.addEventListener("click", exportarAGoogleSheets);
-} else {
-  console.warn("Botón 'Exportar a Google Sheets' no encontrado en el DOM.");
 }
 
 if (btnAbrirSheet) {
   btnAbrirSheet.addEventListener("click", abrirGoogleSheet);
-} else {
-  console.warn("Botón 'Abrir mi Google Sheet' no encontrado en el DOM.");
 }
 
 const inputBuscar = document.getElementById("input-buscar");
@@ -332,7 +376,7 @@ formEditar.addEventListener("submit", async (e) => {
   };
 
   const { error } = await supabaseClient
-    .from(TABLE_NAME)
+    .from("invitados")
     .update(payload)
     .eq("id", id);
   
@@ -354,16 +398,13 @@ modal.addEventListener("click", (e) => {
 });
 
 /***** FUNCIÓN: ELIMINAR REGISTRO *****/
-
 async function eliminarRegistro(id, nombre) {
-  // Confirmación doble para evitar eliminaciones accidentales
   const confirmacion1 = confirm(
     `⚠️ ¿Estás seguro de que deseas ELIMINAR el registro de:\n\n"${nombre}"?\n\nEsta acción NO se puede deshacer.`
   );
   
   if (!confirmacion1) return;
   
-  // Segunda confirmación
   const confirmacion2 = confirm(
     `🚨 ÚLTIMA CONFIRMACIÓN:\n\n¿Realmente deseas eliminar permanentemente este registro?\n\nEscribe mentalmente "CONFIRMAR" y presiona OK.`
   );
@@ -371,95 +412,46 @@ async function eliminarRegistro(id, nombre) {
   if (!confirmacion2) return;
   
   try {
-    console.log("🗑️ Intentando eliminar registro con ID:", id);
-    console.log("📋 Usando tabla:", TABLE_NAME);
-    
-    // Intentar primero con invitados_v
-    let resultado = await supabaseClient
-      .from(TABLE_NAME)
+    const { error } = await supabaseClient
+      .from("invitados")
       .delete()
       .eq("id", id);
     
-    console.log("Resultado de eliminación:", resultado);
-    
-    // Si falla con invitados_v, intentar con invitados
-    if (resultado.error) {
-      console.log("⚠️ Falló con tabla principal, intentando con 'invitados'...");
-      resultado = await supabaseClient
-        .from("invitados")
-        .delete()
-        .eq("id", id);
-    }
-    
-    if (resultado.error) {
-      throw resultado.error;
-    }
-    
-    // Verificar si realmente se eliminó algo
-    if (resultado.data && resultado.data.length === 0) {
-      console.warn("⚠️ La operación no devolvió datos, pero tampoco error");
-    }
+    if (error) throw error;
     
     alert(`✅ Registro de "${nombre}" eliminado exitosamente.`);
-    
-    // Recargar los datos después de un pequeño delay
-    setTimeout(() => {
-      cargarDatos();
-    }, 500);
+    setTimeout(() => cargarDatos(), 500);
     
   } catch (err) {
-    console.error("❌ Error completo al eliminar:", err);
-    console.error("Detalles del error:", {
-      message: err.message,
-      details: err.details,
-      hint: err.hint,
-      code: err.code
-    });
-    alert(`❌ Error al eliminar el registro: ${err.message}\n\nRevisa la consola para más detalles.`);
+    console.error("❌ Error al eliminar:", err);
+    alert(`❌ Error al eliminar el registro: ${err.message}`);
   }
 }
 
-/***** CONFIGURACIÓN GOOGLE SHEETS - PLAZA FLORA (PRUEBA) *****/
+/***** CONFIGURACIÓN GOOGLE SHEETS *****/
 const GOOGLE_SHEETS_CONFIG = {
   "CRM PLAZA FLORA": {
     sheetId: "1uOPb8A1bJ86FdbBZLRtWxJkzw6dEYEeC6YfHDzV1g44",
     sheetName: "GESTION PROSPECTOS",
     webAppUrl: "https://script.google.com/macros/s/AKfycbyjH0jlrcjQTwGWzgCJKzZM_eslIjlk-TCkJkkR5ptPu8miI7SAEjC2VWuvjvRxvTsR/exec"
   }
-  // Aquí agregaremos las demás sedes después de probar
 };
 
 /***** FUNCIÓN: EXPORTAR A GOOGLE SHEETS *****/
-
 async function exportarAGoogleSheets() {
   const btn = document.getElementById("btn-exportar-sheets");
-  if (!btn) {
-    alert("❌ Botón de exportar no encontrado. Verifica el HTML.");
-    return;
-  }
+  if (!btn) return;
 
   btn.disabled = true;
   btn.textContent = "⏳ Sincronizando con Google Sheets...";
 
   try {
-    // 1) Sesión
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    if (!session) {
-      alert("❌ Debes estar autenticado para exportar");
-      return;
-    }
-    const userSede = session.user.app_metadata?.sede || "";
-    const userRole = session.user.app_metadata?.rol || "";
-
-    // 2) Config de Sheets por sede
     const sedeConfig = GOOGLE_SHEETS_CONFIG[userSede];
     if (!sedeConfig) {
       alert(`❌ No hay Google Sheet configurado para tu sede: ${userSede || "(vacía)"}`);
       return;
     }
 
-    // 3) Obtener DATOS usando los mismos FILTROS del dashboard (y SIN paginación)
-    // buildQuery(false) ya aplica: sede, fechas, ver (pendientes/llamados) y desactiva range
     const { data, error } = await buildQuery(false);
     if (error) throw error;
     if (!data || data.length === 0) {
@@ -467,18 +459,12 @@ async function exportarAGoogleSheets() {
       return;
     }
 
-    // 4) Mapear al ORDEN EXACTO de tu hoja:
-    // A:Unidad, B:Fecha, C:Mes, D:Nombre, E:Mayor de edad,
-    // F:Documento, G:Género, H:Teléfono, I:Barrio,
-    // J:Referencia, K:Autorización contacto, L:Estado,
-    // M:Fecha de contacto, N:Motivación, O:Observaciones.
     const MESES = [
       "ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO",
       "JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"
     ];
 
     const filas = data.map(r => {
-      // fecha_d -> "DD/MM/YY" + MES
       let fecha = "", mes = "";
       if (r[COL_FECHA]) {
         const [yyyy, mm, dd] = String(r[COL_FECHA]).split("-");
@@ -489,31 +475,29 @@ async function exportarAGoogleSheets() {
       }
 
       return [
-        r[COL_SEDE] || "",            // Unidad (A)
-        fecha,                        // Fecha (B)
-        mes,                          // Mes (C)
-        r[COL_NOMBRE] || "",          // Nombre (D)
-        r.mayor_edad || "",           // Mayor de edad (E)
-        r[COL_DOCUMENTO] || "",       // Documento (F)
-        r[COL_GENERO] || "",          // Género (G)
-        r[COL_TELEFONO] || "",        // Teléfono (H)
-        r[COL_BARRIO]   || "",        // Barrio (I)
-        r[COL_REFERENCIA] || "",      // Referencia (J)
-        r[COL_AUTORIZACION] || "",    // Autorización contacto (K)
-        r[COL_ESTADO] || "",          // Estado (L)
-        r[COL_FECHA_CONTACTO] || "",  // Fecha de contacto (M)
-        r[COL_MOTIVACION]  || "",     // Motivación (N)
-        r[COL_OBS] || ""              // Observaciones (O)
-      ].map(x => (x == null ? "" : String(x).trim())); // fuerza strings y evita "undefined"
+        r[COL_SEDE] || "",
+        fecha,
+        mes,
+        r[COL_NOMBRE] || "",
+        r.mayor_edad || "",
+        r[COL_DOCUMENTO] || "",
+        r[COL_GENERO] || "",
+        r[COL_TELEFONO] || "",
+        r[COL_BARRIO] || "",
+        r[COL_REFERENCIA] || "",
+        r[COL_AUTORIZACION] || "",
+        r[COL_ESTADO] || "",
+        r[COL_FECHA_CONTACTO] || "",
+        r[COL_MOTIVACION] || "",
+        r[COL_OBS] || ""
+      ].map(x => (x == null ? "" : String(x).trim()));
     });
 
-    // 5) Enviar al WebApp de GAS (sin headers extra → evita preflight)
-       
     const payload = {
-     sheetId: sedeConfig.sheetId,
+      sheetId: sedeConfig.sheetId,
       sheetName: sedeConfig.sheetName,
       data: filas,
-      action: "append"      // ← ahora APENDEMOS (una debajo de otra)
+      action: "append"
     };
 
     const resp = await fetch(sedeConfig.webAppUrl, {
@@ -521,13 +505,6 @@ async function exportarAGoogleSheets() {
       body: JSON.stringify(payload),
       redirect: "follow"
     });
-
-    // Log amigable (la respuesta de GAS a veces no se puede leer)
-    try {
-      console.log("📥 GAS:", await resp.text());
-    } catch (_) {
-      console.log("ℹ️ Respuesta no legible (normal en GAS).");
-    }
 
     alert(`✅ Exportado correctamente\n📊 Filas: ${filas.length}\n🏢 Sede: ${userSede}\n📄 Pestaña: ${sedeConfig.sheetName}`);
   } catch (err) {
@@ -539,19 +516,9 @@ async function exportarAGoogleSheets() {
   }
 }
 
-
-
 /***** FUNCIÓN: ABRIR GOOGLE SHEET *****/
 async function abrirGoogleSheet() {
   try {
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    
-    if (!session) {
-      alert("❌ Debes estar autenticado");
-      return;
-    }
-    
-    const userSede = session.user.app_metadata.sede;
     const sedeConfig = GOOGLE_SHEETS_CONFIG[userSede];
     
     if (!sedeConfig) {
@@ -581,10 +548,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  // Obtener info del usuario PRIMERO
+  await obtenerInfoUsuario();
+
   const { data: { session } } = await supabaseClient.auth.getSession();
   if (session) {
-    const userRole = session.user.app_metadata.rol;
-    
     if (userRole === 'recepcionista') {
       const btnAnalytics = document.querySelector('a[href="../ANALYTICS/index.html"]');
       if (btnAnalytics) btnAnalytics.style.display = 'none';
@@ -593,8 +561,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (btnPresentacion) btnPresentacion.style.display = 'none';
     }
   }
+  
+  // Cargar sedes (solo si es maestro)
+  await cargarSedes();
+  
+  // Cargar datos
+  await cargarDatos();
 });
-
-/***** INIT *****/
-cargarSedes();
-cargarDatos();
