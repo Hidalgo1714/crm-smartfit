@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Registro de Invitados</title>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="../scripts/guardian.js"></script>
+<script src="../config.js"></script> 
+<link rel="stylesheet" href="./styles.css" />
+
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1 class="title">Registro de Invitados</h1>
+      <p class="subtitle">Regional Eje Cafetero - CRM Web</p>
+    </header>
+
+    <!-- Información del usuario logueado -->
+<div id="user-info" class="user-info" style="display: none;">
+  <span id="user-role-badge"></span>
+  <span id="user-sede-badge"></span>
+</div>
+
+  <div style="text-align: right; margin-bottom: 15px; display: flex; justify-content: flex-end; gap: 10px;">
+  <a href="../DASHBOARD/index.html" class="dashboard-btn">📋 Ir al Dashboard</a>
+  <button id="btn-logout" class="btn-logout">🚪 Cerrar Sesión</button>
+</div>
+
+
+    <form id="form" class="form">
+      <!-- Sede -->
+      <label class="label">Sede:</label>
+      <select id="sede" class="input" required>
+        <option>CRM PLAZA FLORA</option>
+        <option>CRM MAKRO DOSQUEBRADAS</option>
+        <option>CRM LA 14 PEREIRA</option>
+        <option>CRM NUESTRO CARTAGO</option>
+        <option>CRM TULUA</option>
+        <option>CRM EXITO VICTORIA</option>
+        <option>CRM MOCAWA</option>
+        <option>CRM MALL PLAZA</option>
+        <option>CRM VERANERA</option>
+        <option>CRM MALL PALO DE AGUA</option>
+        <option>CRM FUNDADORES</option>
+      </select>
+
+      <!-- Nombre -->
+      <label class="label">Nombre:</label>
+      <input id="nombre" class="input" type="text" placeholder="nombre completo" required />
+
+      <!-- Mayor de edad -->
+      <label class="label">Mayor de edad:</label>
+      <select id="mayorEdad" class="input" required>
+        <option>SI</option>
+        <option>NO</option>
+      </select>
+
+      <!-- Documento -->
+      <label class="label">Documento:</label>
+      <input id="documento" class="input" type="text" required />
+
+      <!-- Genero -->
+      <label class="label">Género:</label>
+      <select id="genero" class="input" required>
+        <option>MASCULINO</option>
+        <option>FEMENINO</option>
+      </select>
+
+      <!-- Teléfono -->
+      <label class="label">Teléfono:</label>
+      <input id="telefono" class="input" type="text" required />
+
+      <!-- Barrio   -->
+      <label class="label">Barrio:</label>
+      <input id="barrio" class="input" type="text" placeholder="Opcional" />
+
+      <!-- Referencia -->
+      <label class="label">Referencia:</label>
+      <select id="referencia" class="input" required>
+        <option>INVITADO BLACK</option>
+        <option>VISITA</option>
+      </select>
+
+      <!-- Autorización -->
+      <label class="label">Autorización contacto:</label>
+      <select id="autorizacion" class="input" required>
+        <option>SI</option>
+        <option>NO</option>
+      </select>
+
+      <!-- Estado -->
+      <label class="label">Estado:</label>
+      <select id="estado" class="input" required>
+        <option>En proceso</option>
+        <option>Inscrito</option>
+        <option>Nuevo Lead</option>
+        <option>No interesado</option>
+        <option>Smart otra sede</option>
+        <option>Day pass</option>
+        <option>Activación de marca</option>
+      </select>
+
+      <!-- Fecha de contacto (NUEVO) -->
+      <label class="label">Fecha de contacto (si aplica):</label>
+      <input id="fechaContacto" class="input" type="date" />
+
+      <!-- Motivación (NUEVO) -->
+      <label class="label">Motivación:</label>
+      <select id="motivacion" class="input" required>
+        <option>Clase grupal</option>
+        <option>Entrenamiento</option>
+      </select>
+
+      <!-- Observaciones -->
+      <label class="label">Observaciones:</label>
+      <textarea id="observaciones" class="textarea" rows="4" placeholder="Notas u observaciones"></textarea>
+
+      <button id="btn" class="btn" type="submit">Enviar</button>
+
+      <div id="alert" class="alert" hidden></div>
+    </form>
+  </div>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./app.js"></script>
+</body>
+</html>

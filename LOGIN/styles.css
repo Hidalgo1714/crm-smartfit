@@ -1,0 +1,134 @@
+:root {
+  --sf-yellow: #FFC709;
+  --sf-black: #000000;
+  --sf-dark-gray: #1a1a1a;
+  --sf-light-gray: #2a2a2a;
+}
+
+body {
+  background: var(--sf-black);
+  color: white;
+  font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.login-box {
+  background: var(--sf-dark-gray);
+  padding: 40px;
+  border-radius: 15px;
+  border: 2px solid var(--sf-yellow);
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(255, 199, 9, 0.3);
+}
+
+.title {
+  color: var(--sf-yellow);
+  margin: 0 0 10px 0;
+  font-weight: 700;
+}
+
+.subtitle {
+  color: #ccc;
+  margin: 0 0 30px 0;
+}
+
+.input-group {
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 5px;
+  color: #ccc;
+  font-weight: 600;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 12px;
+  background: var(--sf-light-gray);
+  border: 2px solid #444;
+  border-radius: 8px;
+  color: white;
+  font-size: 1em;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: var(--sf-yellow);
+}
+
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 30px;
+}
+
+button {
+  padding: 14px;
+  border-radius: 8px;
+  border: none;
+  font-size: 1em;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#btn-login {
+  background-color: var(--sf-yellow);
+  color: var(--sf-black);
+}
+
+#btn-login:hover {
+  background-color: #e6b300;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(255, 199, 9, 0.4);
+}
+
+#btn-signup {
+  background-color: transparent;
+  color: var(--sf-yellow);
+  border: 2px solid var(--sf-yellow);
+}
+
+#btn-signup:hover {
+  background-color: var(--sf-yellow);
+  color: var(--sf-black);
+}
+
+.alert {
+  padding: 12px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.alert.ok {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.alert.err {
+  background-color: #F44336;
+  color: white;
+}

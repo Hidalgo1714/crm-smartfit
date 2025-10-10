@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Analytics Avanzado - CRM</title>
+
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="../config.js"></script>
+  <script src="../scripts/guardian.js"></script>
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="header-nav">
+    <div>
+      <h1 class="titulo">📊 Analytics Avanzado</h1>
+      <p class="subtitulo">Análisis detallado y tendencias - Regional EC1</p>
+    </div>
+    <div class="nav-buttons">
+      <a href="../FORMULARIO/index.html" class="nav-btn">📝 Registro</a>
+      <a href="../DASHBOARD/index.html" class="nav-btn">📋 Dashboard</a>
+      <button id="btn-logout" class="nav-btn nav-btn-logout">🚪 Cerrar Sesión</button>
+    </div>
+  </div>
+
+  <!-- KPIs Principales -->
+  <div class="kpis-grid">
+    <div class="kpi-card">
+      <div class="kpi-icon">📊</div>
+      <div class="kpi-value" id="kpi-total">0</div>
+      <div class="kpi-label">Total Registros</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon">✅</div>
+      <div class="kpi-value" id="kpi-inscritos">0</div>
+      <div class="kpi-label">Inscritos</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon">🎯</div>
+      <div class="kpi-value" id="kpi-conversion">0%</div>
+      <div class="kpi-label">Tasa Conversión</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon">📞</div>
+      <div class="kpi-value" id="kpi-llamados">0</div>
+      <div class="kpi-label">Llamados Realizados</div>
+    </div>
+  </div>
+
+  <!-- Filtros Mejorados -->
+  <div class="period-filter">
+    <div class="filter-group">
+      <label>🏢 Sede:</label>
+      <select id="filtro-sede">
+        <option value="">-- Todas las sedes --</option>
+      </select>
+    </div>
+    
+    <div class="filter-group">
+      <label>📅 Período:</label>
+      <select id="periodo">
+        <option value="7">Últimos 7 días</option>
+        <option value="30" selected>Últimos 30 días</option>
+        <option value="90">Últimos 90 días</option>
+        <option value="180">Últimos 6 meses</option>
+        <option value="365">Último año</option>
+        <option value="all">Todo el tiempo</option>
+      </select>
+    </div>
+    
+    <button id="btn-refresh" class="btn-refresh">🔄 Actualizar</button>
+    <button id="btn-limpiar-filtros" class="btn-clear">🗑️ Limpiar Filtros</button>
+    <button id="btn-exportar" class="btn-export">📥 Exportar Excel</button>
+    <button id="btn-exportar-pdf" class="btn-export-pdf">📄 Exportar PDF con Gráficos</button>
+  </div>
+
+  <!-- Grid de Gráficos -->
+  <div class="analytics-grid">
+    <!-- Tendencia Temporal -->
+    <div class="analytics-card wide">
+      <h3>📈 Tendencia de Registros por Día</h3>
+      <canvas id="chartTendencia"></canvas>
+    </div>
+
+    <!-- Top Sedes -->
+    <div class="analytics-card">
+      <h3>🏆 Top 5 Sedes</h3>
+      <canvas id="chartTopSedes"></canvas>
+    </div>
+
+    <!-- Distribución por Género -->
+    <div class="analytics-card">
+      <h3>👥 Distribución por Género</h3>
+      <canvas id="chartGenero"></canvas>
+    </div>
+
+    <!-- Estados por Sede -->
+    <div class="analytics-card wide">
+      <h3>📊 Estados por Sede (Top 5)</h3>
+      <canvas id="chartEstadosSede"></canvas>
+    </div>
+
+    <!-- Referencias -->
+    <div class="analytics-card">
+      <h3>🎫 Tipos de Referencia</h3>
+      <canvas id="chartReferencias"></canvas>
+    </div>
+
+    <!-- Autorización -->
+    <div class="analytics-card">
+      <h3>✉️ Autorización de Contacto</h3>
+      <canvas id="chartAutorizacion"></canvas>
+    </div>
+
+    <!-- Conversión por Sede -->
+    <div class="analytics-card wide">
+      <h3>🎯 Tasa de Conversión por Sede</h3>
+      <canvas id="chartConversion"></canvas>
+    </div>
+
+    <!-- Resumen Semanal -->
+    <div class="analytics-card wide">
+      <h3>📅 Registros por Día de la Semana</h3>
+      <canvas id="chartSemanal"></canvas>
+    </div>
+  </div>
+
+  <!-- Librerías -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="analytics.js"></script>
+</body>
+</html>

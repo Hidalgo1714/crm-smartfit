@@ -1,0 +1,10 @@
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Editores
+.vscode/
+.idea/
+
+# No subir archivos sensibles (aunque tu key es pública)
+# config.js

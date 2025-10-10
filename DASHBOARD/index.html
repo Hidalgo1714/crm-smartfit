@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Dashboard CRM</title>
+
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="../config.js"></script>
+  <script src="../scripts/guardian.js"></script>
+  
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h1 class="titulo">Dashboard CRM</h1>
+  <p class="subtitulo">Regional EC1</p>
+  
+  <div style="text-align: right; margin-bottom: 15px; display: flex; justify-content: flex-end; gap: 10px;">
+    <a href="../FORMULARIO/index.html" class="dashboard-btn">📝 Ir al Registro</a>
+    <a href="../ANALYTICS/index.html" class="dashboard-btn analytics-btn">📊 Analytics Avanzado</a>
+    <button id="btn-presentation" class="dashboard-btn presentation-btn">🖥️ Modo Presentación</button>
+     <button id="btn-logout" class="nav-btn-logout">🚪 Cerrar Sesión</button>
+  </div>
+
+  <!-- Tarjetas resumen -->
+  <div class="cards" id="cards">
+    <div class="card">
+      <span id="inscritos-count">0</span>
+      <p>Total de registros con estado <b>INSCRITO</b>.</p>
+    </div>
+    <div class="card">
+      <span id="nointeresados-count">0</span>
+      <p>Total de registros con estado <b>NO INTERESADO</b>.</p>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filtros" id="filtros">
+    <h2>Filtros</h2>
+    <label for="filtro-sede">Sede</label>
+    <select id="filtro-sede">
+      <option value="">-- Todas --</option>
+    </select>
+
+    <label for="filtro-desde">Desde</label>
+    <input type="date" id="filtro-desde" />
+
+    <label for="filtro-hasta">Hasta</label>
+    <input type="date" id="filtro-hasta" />
+
+    <label for="filtro-ver">Ver</label>
+    <select id="filtro-ver">
+      <option value="todos">Todos</option>
+      <option value="pendientes">Pendientes</option>
+      <option value="llamados">Llamados</option>
+    </select>
+<button id="btn-aplicar" class="btn-aplicar">Aplicar</button>
+    <button id="btn-limpiar" class="btn-limpiar">Limpiar</button>
+    <button id="btn-exportar" class="btn-exportar">📥Exportar a Excel</button>
+    <button id="btn-exportar-sheets" class="btn-exportar-sheets">☁️ Exportar a Google Sheets</button>
+<button id="btn-abrir-sheet" class="btn-abrir-sheet">📊 Abrir mi Google Sheet</button>
+  </div> <div class="search-container">
+    <input type="search" id="input-buscar" placeholder="🔍 Buscar por nombre o documento...">
+  </div>
+
+<div class="tabla-container" id="tabla-container">
+  <h3>Registros (detalle)</h3>
+  <table id="tabla-registros">
+   <thead>
+  <tr>
+    <th>Fecha</th>
+    <th>Sede</th>
+    <th>Nombre</th>
+    <th>Documento</th>
+    <th>Género</th>
+    <th>Teléfono</th>
+    <th>Barrio</th>              
+    <th>Referencia</th>
+    <th>Autorización</th>
+    <th>Estado</th>
+    <th>Fecha de contacto</th>   
+    <th>Motivación</th>          
+    <th>Observaciones</th>
+    <th>Llamado</th>
+    <th>Editar</th>
+    <th>Eliminar</th>
+  </tr>
+</thead>
+
+    <tbody id="tabla-body">
+    </tbody>
+  </table>
+  <div id="paginacion"></div>
+</div>
+
+  <!-- Mensajes -->
+  <div id="hints" class="hints"></div>
+
+  <!-- Librerías -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="dashboard.js" defer></script>
+
+<div id="modal-editar" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <span class="modal-close" id="modal-close-btn">&times;</span>
+      <h2>Editar Registro</h2>
+      <form id="form-editar">
+        <input type="hidden" id="edit-id"> <label for="edit-nombre">Nombre:</label>
+        <input type="text" id="edit-nombre" disabled> <label for="edit-estado">Estado:</label>
+        <select id="edit-estado">
+          <option value="Nuevo Lead">Nuevo Lead</option>
+          <option value="En proceso">En proceso</option>
+          <option value="Inscrito">Inscrito</option>
+          <option value="No interesado">No interesado</option>
+          <option value="Smart otra sede">Smart otra sede</option>
+          <option value="Day pass">Day pass</option>
+          <option value="Activación de marca">Activación de marca</option>
+        </select>
+
+        <label for="edit-telefono">Teléfono:</label>
+        <input type="text" id="edit-telefono">
+
+        <label for="edit-observaciones">Observaciones:</label>
+        <textarea id="edit-observaciones" rows="4"></textarea>
+
+        <div class="modal-actions">
+          <button type="submit" id="btn-guardar-cambios" class="btn-aplicar">Guardar Cambios</button>
+          <button type="button" id="btn-cancelar" class="btn-limpiar">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  </body>
+</html>
