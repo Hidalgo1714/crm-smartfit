@@ -439,12 +439,66 @@ const GOOGLE_SHEETS_CONFIG = {
    "CRM NUESTRO CARTAGO": {
     sheetId: "1SCjXq4Xq7_HVp9QJeduHPk5ExgAvSBEh5MNjlK-kxrU", 
     sheetName: "GESTION PROSPECTOS", 
-    webAppUrl: "https://script.google.com/macros/s/AKfycbwnUO21P6lIssc-FuAPlwassYDzDBldVJ1eDWvRl9pWQEr8GYlBnW7rTNtvAjSpFhc/exec" 
-  }
+    webAppUrl: "https://script.google.com/macros/s/AKfycbwrhS_DCBekXZlotHTO739ZISyfBF9hbVowQrXsncWNYlzTbXC8M2KsuiyxjqJHdkpI/exec" 
+  },
+
+   "CRM MAKRO DOSQUEBRADAS": {
+    sheetId: "1eYK6C_kZXY3MJRkCBLB90Sn5evtaVzDN2_WYhGc9zOw",
+    sheetName: "GESTION PROSPECTOS",
+    webAppUrl: "https://script.google.com/macros/s/AKfycbxL54daGMmcVUxVnCdk9IU4x7EYHjd0oNwTJWJddWB_cyGMddi4ozNf3jrmWfB2PG52/exec"
+  },
+
+   "CRM EXITO VICTORIA": {
+    sheetId: "15pMUcIXNyuJeKMVXvNQ27eyfOvZrDY1UzSsT4irH8ck",
+    sheetName: "GESTION PROSPECTOS",
+    webAppUrl: "https://script.google.com/macros/s/AKfycbzjzxfuCu978pWRHFvGeKMPBg-GmyXblQSVzSHTiPXn-IwqUsW9Qj2WDH6KgKlaboYf1w/exec"
+  },
+   
+   "CRM FUNDADORES": {
+    sheetId: "12sV2zYHZ92nMIlIOY8tJ2QytRSiT2AWbilYD_UH5QkA",
+    sheetName: "GESTION PROSPECTOS",
+    webAppUrl: "https://script.google.com/macros/s/AKfycbyUkptPzIHXACKHHjwXgYZ8xLXxYMnUo9Dw21b3m9hJPc4-zrmJh7NVjOhtrsoZCi0m_g/exec"
+  },
+
+  "CRM MALL PALO DE AGUA": {
+    sheetId: "1o7oQlfBOewDPjbXG4NVj2dQxsyIrowy-kUt_tunpyDQ",
+    sheetName: "GESTION PROSPECTOS",
+    webAppUrl: "https://script.google.com/macros/s/AKfycbytms4veLq4bVRB9idNbXofTKQLDgTCdz1pSAbhcAyZVgHsVtqv4r5QCvuwqhbEDc0/exec"
+  },
+
+  "CRM MALL PLAZA": {
+    sheetId: "1W7RTS-znpZDr06TdZUMmkuYRhxQ-g-FrQvm7q-_VFws",
+    sheetName: "GESTION PROSPECTOS",
+    webAppUrl: "https://script.google.com/macros/s/AKfycbx-UwpK4Ptj5ZJkzdabIvCfl76lTdaaR3cr797Dw5i0Ls3PfQuAiudH1AH-d307Om9Q7A/exec"
+  },
   
+  "CRM MOCAWA": {
+    sheetId: "1t6ZwKykM9i-SQW0t69mT5LHDKdU1ImtQghpcLavdU1o",
+    sheetName: "GESTION PROSPECTOS",
+    webAppUrl: "https://script.google.com/macros/s/AKfycbwUlvJVEE5Y2EWFEdu5S4rS45xsNTyNzHol3Hk5XnSX5qZl5R37QBVap5vCQyZ-yEUI/exec"
+  },
+
+  "CRM LA 14 PEREIRA": {
+    sheetId: "1D36qQ9gK33BGzdcc75CY1cLyTJa1_0vV4RJyOQlRjcQ",
+    sheetName: "GESTION PROSPECTOS",
+    webAppUrl: "https://script.google.com/macros/s/AKfycbxmZYzX6SbU-qydsFaCQNsFh-FvehxZ2r-H1x-q855JvvsXtDwQs24kaIPLXak-eVfzew/exec"
+  },
+
+  "CRM TULUA": {
+    sheetId: "1A525aAX61J3r-vEIvwR2OsFgbODl2sztJOsbXvpgzQw",
+    sheetName: "GESTION PROSPECTOS",
+    webAppUrl: "https://script.google.com/macros/s/AKfycbwLSH7r4euJdr3yWf2haQbvZPw-TwEuSPmXeqNkjGf6fxBSbNyoDMw-fMXbYJBeNgCP/exec"
+  },
+
+  "CRM VERANERA": {
+    sheetId: "11ZlcLfdY-9rkDEVKrfRZHfCg-OpZL0I8K-pTOJPRrPE",
+    sheetName: "GESTION PROSPECTOS",
+    webAppUrl: "https://script.google.com/macros/s/AKfycbyHA4wb2jNREhz9m1rQOaqqe7ip25qJIH3HfMNltoan7bPJPYdh2OTxvBEJGy4oZVwM9w/exec"
+  },
+
 };
 
-/***** FUNCIÓN: EXPORTAR A GOOGLE SHEETS *****/
+/***** FUNCIÓN: EXPORTAR A GOOGLE SHEETS (MEJORADA) *****/
 async function exportarAGoogleSheets() {
   const btn = document.getElementById("btn-exportar-sheets");
   if (!btn) return;
@@ -453,19 +507,57 @@ async function exportarAGoogleSheets() {
   btn.textContent = "⏳ Sincronizando con Google Sheets...";
 
   try {
+    // Verificar que existe configuración para esta sede
     const sedeConfig = GOOGLE_SHEETS_CONFIG[userSede];
+    
     if (!sedeConfig) {
-      alert(`❌ No hay Google Sheet configurado para tu sede: ${userSede || "(vacía)"}`);
+      const sedesConfiguradas = Object.keys(GOOGLE_SHEETS_CONFIG);
+      alert(
+        `❌ No hay Google Sheet configurado para tu sede\n\n` +
+        `Tu sede: ${userSede || "(no detectada)"}\n\n` +
+        `Sedes configuradas:\n${sedesConfiguradas.map(s => `  • ${s}`).join('\n')}\n\n` +
+        `📝 Para configurar tu sede:\n` +
+        `1. Abre el Google Sheet de tu sede\n` +
+        `2. Crea un Apps Script (Extensiones → Apps Script)\n` +
+        `3. Despliega como Web App\n` +
+        `4. Agrega la configuración en dashboard.js\n\n` +
+        `Contacta al administrador si necesitas ayuda.`
+      );
+      console.error("❌ Sede no configurada:", userSede);
+      console.log("🔧 Sedes disponibles:", sedesConfiguradas);
       return;
     }
 
+    // Validar que la configuración esté completa
+    if (!sedeConfig.sheetId || !sedeConfig.webAppUrl || !sedeConfig.sheetName) {
+      alert(
+        `❌ Configuración incompleta para ${userSede}\n\n` +
+        `Falta alguno de estos datos:\n` +
+        `- Sheet ID: ${sedeConfig.sheetId ? '✅' : '❌'}\n` +
+        `- Web App URL: ${sedeConfig.webAppUrl ? '✅' : '❌'}\n` +
+        `- Nombre pestaña: ${sedeConfig.sheetName ? '✅' : '❌'}`
+      );
+      console.error("❌ Configuración incompleta:", sedeConfig);
+      return;
+    }
+
+    console.log("📋 Configuración detectada:", {
+      sede: userSede,
+      sheetId: sedeConfig.sheetId,
+      sheetName: sedeConfig.sheetName,
+      webAppUrl: sedeConfig.webAppUrl.substring(0, 50) + "..."
+    });
+
+    // Obtener datos
     const { data, error } = await buildQuery(false);
     if (error) throw error;
+    
     if (!data || data.length === 0) {
       alert("⚠️ No hay datos para exportar con los filtros actuales");
       return;
     }
 
+    // Preparar los datos en el formato correcto
     const MESES = [
       "ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO",
       "JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"
@@ -507,40 +599,130 @@ async function exportarAGoogleSheets() {
       action: "append"
     };
 
+    console.log("📤 Enviando a Google Sheets:", {
+      sede: userSede,
+      filas: filas.length,
+      primeraFila: filas[0],
+      url: sedeConfig.webAppUrl
+    });
+
+    // Realizar la petición con timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 segundos
+
     const resp = await fetch(sedeConfig.webAppUrl, {
       method: "POST",
       body: JSON.stringify(payload),
-      redirect: "follow"
+      redirect: "follow",
+      signal: controller.signal,
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+      }
     });
 
-    alert(`✅ Exportado correctamente\n📊 Filas: ${filas.length}\n🏢 Sede: ${userSede}\n📄 Pestaña: ${sedeConfig.sheetName}`);
+    clearTimeout(timeoutId);
+
+    console.log("📥 Respuesta recibida:", {
+      status: resp.status,
+      statusText: resp.statusText,
+      ok: resp.ok
+    });
+
+    if (!resp.ok) {
+      throw new Error(`HTTP ${resp.status}: ${resp.statusText}`);
+    }
+
+    const result = await resp.text();
+    console.log("✅ Resultado:", result);
+
+    let resultData;
+    try {
+      resultData = JSON.parse(result);
+    } catch (e) {
+      console.warn("⚠️ La respuesta no es JSON válido:", result);
+      resultData = { success: true };
+    }
+
+    if (resultData.error) {
+      throw new Error(resultData.error);
+    }
+
+    alert(
+      `✅ Exportado correctamente a Google Sheets\n\n` +
+      `📊 Filas exportadas: ${filas.length}\n` +
+      `🏢 Sede: ${userSede}\n` +
+      `📄 Pestaña: ${sedeConfig.sheetName}\n\n` +
+      `Puedes verificar los datos en tu Google Sheet.`
+    );
+    
   } catch (err) {
-    console.error("❌ Exportar Sheets:", err);
-    alert(`❌ Error al exportar: ${err.message}`);
+    console.error("❌ Error completo al exportar:", err);
+    
+    let mensajeError = `❌ Error al exportar a Google Sheets\n\n`;
+    
+    if (err.name === 'AbortError') {
+      mensajeError += `⏱️ Tiempo de espera agotado (30s)\n\n`;
+    } else if (err.message.includes('CORS')) {
+      mensajeError += `🔒 Error de permisos (CORS)\n\n` +
+        `Posibles causas:\n` +
+        `1. El Apps Script NO está desplegado como "Cualquier usuario"\n` +
+        `2. La URL del Apps Script es incorrecta\n` +
+        `3. El Apps Script no existe o fue eliminado\n\n`;
+    } else if (err.message.includes('Failed to fetch')) {
+      mensajeError += `🌐 No se pudo conectar con Google Sheets\n\n` +
+        `Posibles causas:\n` +
+        `1. Problemas de conexión a internet\n` +
+        `2. La URL del Apps Script es incorrecta\n` +
+        `3. El Apps Script no está publicado\n\n`;
+    } else {
+      mensajeError += `${err.message}\n\n`;
+    }
+    
+    mensajeError += `📋 Detalles técnicos:\n` +
+      `• Sede: ${userSede}\n` +
+      `• Sheet ID: ${GOOGLE_SHEETS_CONFIG[userSede]?.sheetId || 'No configurado'}\n` +
+      `• Pestaña: ${GOOGLE_SHEETS_CONFIG[userSede]?.sheetName || 'No configurado'}\n\n` +
+      `💡 Tip: Intenta usar "Exportar a Excel" mientras tanto.`;
+    
+    alert(mensajeError);
+    
   } finally {
     btn.disabled = false;
     btn.textContent = "☁️ Exportar a Google Sheets";
   }
 }
 
-/***** FUNCIÓN: ABRIR GOOGLE SHEET *****/
+/***** FUNCIÓN: ABRIR GOOGLE SHEET (MEJORADA) *****/
 async function abrirGoogleSheet() {
   try {
     const sedeConfig = GOOGLE_SHEETS_CONFIG[userSede];
     
     if (!sedeConfig) {
-      alert(`❌ No hay Google Sheet configurado para tu sede: ${userSede}`);
+      const sedesConfiguradas = Object.keys(GOOGLE_SHEETS_CONFIG);
+      alert(
+        `❌ No hay Google Sheet configurado para tu sede\n\n` +
+        `Tu sede: ${userSede}\n\n` +
+        `Sedes configuradas:\n${sedesConfiguradas.join('\n')}`
+      );
+      return;
+    }
+    
+    if (!sedeConfig.sheetId) {
+      alert(`❌ No hay Sheet ID configurado para ${userSede}`);
       return;
     }
     
     const sheetUrl = `https://docs.google.com/spreadsheets/d/${sedeConfig.sheetId}/edit`;
+    console.log("🔗 Abriendo Google Sheet:", sheetUrl);
     window.open(sheetUrl, '_blank');
     
   } catch (err) {
-    console.error("Error:", err);
-    alert(`Error al abrir el sheet: ${err.message}`);
+    console.error("❌ Error al abrir sheet:", err);
+    alert(`❌ Error al abrir el Google Sheet:\n${err.message}`);
   }
 }
+
+
 
 /***** INICIALIZACIÓN *****/
 document.addEventListener('DOMContentLoaded', async () => {
