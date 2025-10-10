@@ -434,7 +434,14 @@ const GOOGLE_SHEETS_CONFIG = {
     sheetId: "1uOPb8A1bJ86FdbBZLRtWxJkzw6dEYEeC6YfHDzV1g44",
     sheetName: "GESTION PROSPECTOS",
     webAppUrl: "https://script.google.com/macros/s/AKfycbyjH0jlrcjQTwGWzgCJKzZM_eslIjlk-TCkJkkR5ptPu8miI7SAEjC2VWuvjvRxvTsR/exec"
+  },
+
+   "CRM NUESTRO CARTAGO": {
+    sheetId: "1SCjXq4Xq7_HVp9QJeduHPk5ExgAvSBEh5MNjlK-kxrU", 
+    sheetName: "GESTION PROSPECTOS", 
+    webAppUrl: "https://script.google.com/macros/s/AKfycbwnUO21P6lIssc-FuAPlwassYDzDBldVJ1eDWvRl9pWQEr8GYlBnW7rTNtvAjSpFhc/exec" 
   }
+  
 };
 
 /***** FUNCIÓN: EXPORTAR A GOOGLE SHEETS *****/
